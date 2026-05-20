@@ -196,7 +196,11 @@
                     <div class="info-item"><span>중성자 수:</span> <span id="targetN">0</span></div>
                     <div class="info-item"><span>전자 수:</span> <span id="targetEContainer"><button class="check-btn-outline" onclick="showElectronCount()">클릭하여 확인</button></span></div>
                 </div>
-                <div id="chargeBox" class="charge-box" style="background-color: #e6fcf5; color: var(--g-color);">총 전하량: <span id="totalCharge">0</span></div>
+                <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px;">
+                    <div id="nucleusChargeBox" style="background-color: #e6fcf5; color: #20c997; padding: 8px; border-radius: 8px; font-weight: 700; text-align: center; font-size: 0.95rem;">원자핵 전하량: <span id="nucleusCharge">+1</span></div>
+                    <div id="electronChargeBox" style="background-color: #e6fcf5; color: #20c997; padding: 8px; border-radius: 8px; font-weight: 700; text-align: center; font-size: 0.95rem;">전자 총 전하량: <span id="electronCharge">0</span></div>
+                </div>
+                <div id="chargeBox" class="charge-box" style="background-color: #e6fcf5; color: #20c997; font-size: 1.05rem;">총 전하량: <span id="totalCharge">0</span></div>
                 <div class="usage-guide">
                     <b>💡 사용 방법</b><br>
                     1. 슬라이더로 목표 원소를 정하세요.<br>
@@ -234,8 +238,8 @@
                     <div class="card-input-box">
                         <label>✨ 원소의 특징, 쓰임새 등</label>
                         <div id="featureList" style="display:flex; flex-direction:column; gap:8px;">
-                            <div class="feature-item"><textarea class="auto-height" placeholder="(예시) 물을 구성하는 원소이다." oninput="autoResize(this); checkCompletion();"></textarea></div>
-                            <div class="feature-item"><textarea class="auto-height" placeholder="(예시) 우주에서 가장 가볍고 풍부한 원소이다." oninput="autoResize(this); checkCompletion();"></textarea></div>
+                            <div class="feature-item"><textarea class="auto-height" placeholder="특징 또는 쓰임새를 입력하세요." oninput="autoResize(this); checkCompletion();"></textarea></div>
+                            <div class="feature-item"><textarea class="auto-height" placeholder="특징 또는 쓰임새를 입력하세요." oninput="autoResize(this); checkCompletion();"></textarea></div>
                         </div>
                         <button id="addFeatureBtn" class="add-feature-btn" onclick="addFeatureField()">+ 특징 입력칸 추가</button>
                     </div>
@@ -273,7 +277,51 @@
         function handleCanvasClick(event) { if (isVerified) return; const rect = canvas.getBoundingClientRect(), scale = 800 / rect.width; const x = (event.clientX - rect.left) * scale, y = (event.clientY - rect.top) * scale; let deleted = false; const types = ['e', 'n', 'p']; for (let type of types) { for (let i = atoms[type].length - 1; i >= 0; i--) { const p = atoms[type][i]; if (!deleted && Math.sqrt((x - p.lastX)**2 + (y - p.lastY)**2) < 25) { atoms[type].splice(i, 1); deleted = true; if (type !== 'e') reorderCore(); } } if (deleted) break; } if (deleted) updateUI(); }
         function reorderCore() { const combined = [...atoms.p.map(p => ({...p, type: 'p'})), ...atoms.n.map(n => ({...n, type: 'n'}))]; for (let i = combined.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [combined[i], combined[j]] = [combined[j], combined[i]]; } combined.forEach((p, i) => { const angle = i * 2.399; const dist = Math.sqrt(i) * 14; const orig = atoms[p.type].find(item => item.id === p.id); if (orig) { orig.lastX = cx + Math.cos(angle)*dist; orig.lastY = cy + Math.sin(angle)*dist; } }); }
         function reset() { isVerified = false; atoms = { p: [], n: [], e: [] }; updateUI(); }
-        function updateUI() { document.getElementById('currP').innerText = atoms.p.length; document.getElementById('currN').innerText = atoms.n.length; document.getElementById('currE').innerText = atoms.e.length; const charge = atoms.p.length - atoms.e.length; const chargeText = (charge > 0 ? "+" : "") + charge; const chargeBox = document.getElementById('totalCharge'); chargeBox.innerText = chargeText; if (charge > 0) { chargeBox.parentElement.style.backgroundColor = "#fff5f5"; chargeBox.parentElement.style.color = "#ff4d4d"; } else if (charge < 0) { chargeBox.parentElement.style.backgroundColor = "#e7f5ff"; chargeBox.parentElement.style.color = "#339af0"; } else { chargeBox.parentElement.style.backgroundColor = "#e6fcf5"; chargeBox.parentElement.style.color = "#20c997"; } }
+        function updateUI() { 
+            document.getElementById('currP').innerText = atoms.p.length; 
+            document.getElementById('currN').innerText = atoms.n.length; 
+            document.getElementById('currE').innerText = atoms.e.length; 
+            
+            // 원자핵 전하량 (양성자 수만큼 +)
+            const nucleusCharge = atoms.p.length;
+            document.getElementById('nucleusCharge').innerText = nucleusCharge > 0 ? "+" + nucleusCharge : "0";
+            const nucleusBox = document.getElementById('nucleusChargeBox');
+            if (nucleusCharge > 0) {
+                nucleusBox.style.backgroundColor = "#fff5f5"; 
+                nucleusBox.style.color = "#ff4d4d";
+            } else {
+                nucleusBox.style.backgroundColor = "#e6fcf5"; 
+                nucleusBox.style.color = "#20c997";
+            }
+            
+            // 전자 총 전하량 (전자 수만큼 -)
+            const electronCharge = -atoms.e.length;
+            document.getElementById('electronCharge').innerText = electronCharge < 0 ? electronCharge : "0";
+            const electronBox = document.getElementById('electronChargeBox');
+            if (electronCharge < 0) {
+                electronBox.style.backgroundColor = "#e7f5ff"; 
+                electronBox.style.color = "#339af0";
+            } else {
+                electronBox.style.backgroundColor = "#e6fcf5"; 
+                electronBox.style.color = "#20c997";
+            }
+            
+            // 총 전하량
+            const charge = atoms.p.length - atoms.e.length; 
+            const chargeText = (charge > 0 ? "+" : "") + charge; 
+            document.getElementById('totalCharge').innerText = chargeText; 
+            const totalBox = document.getElementById('chargeBox');
+            if (charge > 0) { 
+                totalBox.style.backgroundColor = "#fff5f5"; 
+                totalBox.style.color = "#ff4d4d"; 
+            } else if (charge < 0) { 
+                totalBox.style.backgroundColor = "#e7f5ff"; 
+                totalBox.style.color = "#339af0"; 
+            } else { 
+                totalBox.style.backgroundColor = "#e6fcf5"; 
+                totalBox.style.color = "#20c997"; 
+            } 
+        }
         function verifyAtom() { const target = elements[currentIdx], isCorrect = (atoms.p.length === target.p && atoms.n.length === target.nt && atoms.e.length === target.p); const box = document.getElementById('alertBox'); box.style.display = 'block'; box.className = "animate-alert " + (isCorrect ? "alert-success" : "alert-wrong"); box.innerText = isCorrect ? `✨ 정답입니다! [${target.n}] 완성!` : "입자를 다시 확인해 보세요! ⚠️"; const nextBtn = document.getElementById('nextBtn'); if (isCorrect) { isVerified = true; triggerConfetti(); nextBtn.disabled = false; nextBtn.classList.add('btn-next-active'); } else { isVerified = false; nextBtn.disabled = true; nextBtn.style.background = "#adb5bd"; nextBtn.style.opacity = "0.6"; nextBtn.classList.remove('btn-next-active'); } setTimeout(() => { box.style.display = 'none'; }, 2200); }
         function toggleOrbit() { showOrbitLines = !showOrbitLines; const btn = document.getElementById('orbitToggleBtn'); btn.style.background = showOrbitLines ? "#adb5bd" : "var(--e-color)"; }
         function drawAtom(targetCtx, move = true) { targetCtx.clearRect(0, 0, 800, 800); const eLen = atoms.e.length; let r = eLen === 0 ? 140 : (eLen < 3 ? 180 : (eLen < 11 ? 240 : 330)); targetCtx.shadowColor = 'rgba(0, 0, 0, 0.2)'; targetCtx.shadowBlur = 15; const bgGrad = targetCtx.createRadialGradient(cx-30, cy-30, 0, cx, cy, r); bgGrad.addColorStop(0, 'rgba(240, 248, 255, 1)'); bgGrad.addColorStop(1, 'rgba(220, 232, 245, 1)'); targetCtx.beginPath(); targetCtx.arc(cx, cy, r, 0, Math.PI * 2); targetCtx.fillStyle = bgGrad; targetCtx.fill(); targetCtx.shadowBlur = 0; atoms.p.forEach(p => drawBall(targetCtx, p.lastX, p.lastY, 14, '#ff4d4d', '+')); atoms.n.forEach(n => drawBall(targetCtx, n.lastX, n.lastY, 14, '#adb5bd', '')); let eIdx = 0; [2, 8, 8, 8].forEach((max, s) => { const count = Math.min(eLen - eIdx, max); if(count <= 0) return; const dist = 135 + (s * 60); if (showOrbitLines) { targetCtx.beginPath(); targetCtx.arc(cx, cy, dist, 0, Math.PI * 2); targetCtx.strokeStyle = 'rgba(51, 154, 240, 0.2)'; targetCtx.lineWidth = 2; targetCtx.stroke(); } for (let i = 0; i < count; i++) { const p = atoms.e[eIdx + i]; let currentAngle = (i * (Math.PI*2/count)) + (move ? (rotationAngle * (1 / (s + 1))) : 0); let ex = cx + Math.cos(currentAngle)*dist, ey = cy + Math.sin(currentAngle)*dist; if(move) { p.lastX = ex; p.lastY = ey; } drawBall(targetCtx, ex, ey, 13, '#339af0', '-'); } eIdx += count; }); }
