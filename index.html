@@ -207,7 +207,7 @@
                     2. 정보를 보고 입자를 알맞게 배치하세요.<br>
                     3. 원자 속 입자를 클릭하면 지워집니다.
                 </div>
-                <input type="range" id="elSlider" min="1" max="20" value="1" oninput="updateTarget(this.value)" style="width:100%;">
+                <input type="range" id="elSlider" min="1" max="24" value="1" oninput="updateTarget(this.value)" style="width:100%;">
                 <div id="sliderLabel" style="text-align:center; font-weight:800; color:var(--e-color); margin-top:5px;">H 수소</div>
                 <button id="orbitToggleBtn" class="btn-verify" style="background:var(--e-color); height:45px; font-size:1rem; margin-top:5px;" onclick="toggleOrbit()">🔵 전자 궤도 보이기/숨기기</button>
                 <div class="page2-nav-buttons">
@@ -273,13 +273,13 @@
         const canvas = document.getElementById('atomCanvas'); const ctx = canvas.getContext('2d');
         const cardCanvas = document.getElementById('cardCanvas'); const cardCtx = cardCanvas.getContext('2d');
         const cx = 400, cy = 425; let rotationAngle = 0, showOrbitLines = false, isVerified = false;
-        const elements = [{n:"수소",s:"H",p:1,nt:0},{n:"헬륨",s:"He",p:2,nt:2},{n:"리튬",s:"Li",p:3,nt:3},{n:"베릴륨",s:"Be",p:4,nt:5},{n:"붕소",s:"B",p:5,nt:5},{n:"탄소",s:"C",p:6,nt:6},{n:"질소",s:"N",p:7,nt:7},{n:"산소",s:"O",p:8,nt:8},{n:"플루오린",s:"F",p:9,nt:10},{n:"네온",s:"Ne",p:10,nt:10},{n:"나트륨",s:"Na",p:11,nt:12},{n:"마그네슘",s:"Mg",p:12,nt:12},{n:"알루미늄",s:"Al",p:13,nt:14},{n:"규소",s:"Si",p:14,nt:14},{n:"인",s:"P",p:15,nt:16},{n:"황",s:"S",p:16,nt:16},{n:"염소",s:"Cl",p:17,nt:18},{n:"아르곤",s:"Ar",p:18,nt:22},{n:"칼륨",s:"K",p:19,nt:20},{n:"칼슘",s:"Ca",p:20,nt:20}];
+        const elements = [{n:"수소",s:"H",p:1,nt:0},{n:"헬륨",s:"He",p:2,nt:2},{n:"리튬",s:"Li",p:3,nt:3},{n:"베릴륨",s:"Be",p:4,nt:5},{n:"붕소",s:"B",p:5,nt:5},{n:"탄소",s:"C",p:6,nt:6},{n:"질소",s:"N",p:7,nt:7},{n:"산소",s:"O",p:8,nt:8},{n:"플루오린",s:"F",p:9,nt:10},{n:"네온",s:"Ne",p:10,nt:10},{n:"나트륨",s:"Na",p:11,nt:12},{n:"마그네슘",s:"Mg",p:12,nt:12},{n:"알루미늄",s:"Al",p:13,nt:14},{n:"규소",s:"Si",p:14,nt:14},{n:"인",s:"P",p:15,nt:16},{n:"황",s:"S",p:16,nt:16},{n:"염소",s:"Cl",p:17,nt:18},{n:"아르곤",s:"Ar",p:18,nt:22},{n:"칼륨",s:"K",p:19,nt:20},{n:"칼슘",s:"Ca",p:20,nt:20},{n:"철",s:"Fe",p:26,nt:30},{n:"니켈",s:"Ni",p:28,nt:31},{n:"구리",s:"Cu",p:29,nt:34},{n:"아연",s:"Zn",p:30,nt:34}];
         let atoms = { p: [], n: [], e: [] }, currentIdx = 0, confetti = [];
 
         function goPage(num) { document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active')); const targetPage = document.getElementById('page' + num); if (targetPage) targetPage.classList.add('active'); window.scrollTo(0, 0); if(num === 3) syncCard(); }
         function updateTarget(val) { currentIdx = val - 1; isVerified = false; const el = elements[currentIdx]; document.getElementById('targetHeader').innerText = `${el.s} ${el.n}`; document.getElementById('sliderLabel').innerText = `${el.s} ${el.n}`; document.getElementById('targetP').innerText = el.p; document.getElementById('targetN').innerText = el.nt; document.getElementById('targetEContainer').innerHTML = `<button class="check-btn-outline" onclick="showElectronCount()">클릭하여 확인</button>`; const nextBtn = document.getElementById('nextBtn'); nextBtn.disabled = true; nextBtn.style.background = "#adb5bd"; nextBtn.style.opacity = "0.6"; nextBtn.classList.remove('btn-next-active'); }
         function showElectronCount() { document.getElementById('targetEContainer').innerText = elements[currentIdx].p; }
-        function addParticle(type) { if (isVerified) return; if (atoms[type].length < 26) { atoms[type].push({ id: Math.random() }); if (type !== 'e') reorderCore(); updateUI(); } }
+        function addParticle(type) { if (isVerified) return; if (atoms[type].length < 35) { atoms[type].push({ id: Math.random() }); if (type !== 'e') reorderCore(); updateUI(); } }
         function handleCanvasClick(event) { if (isVerified) return; const rect = canvas.getBoundingClientRect(), scale = 800 / rect.width; const x = (event.clientX - rect.left) * scale, y = (event.clientY - rect.top) * scale; let deleted = false; const types = ['e', 'n', 'p']; for (let type of types) { for (let i = atoms[type].length - 1; i >= 0; i--) { const p = atoms[type][i]; if (!deleted && Math.sqrt((x - p.lastX)**2 + (y - p.lastY)**2) < 25) { atoms[type].splice(i, 1); deleted = true; if (type !== 'e') reorderCore(); } } if (deleted) break; } if (deleted) updateUI(); }
         function reorderCore() { const combined = [...atoms.p.map(p => ({...p, type: 'p'})), ...atoms.n.map(n => ({...n, type: 'n'}))]; for (let i = combined.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [combined[i], combined[j]] = [combined[j], combined[i]]; } combined.forEach((p, i) => { const angle = i * 2.399; const dist = Math.sqrt(i) * 14; const orig = atoms[p.type].find(item => item.id === p.id); if (orig) { orig.lastX = cx + Math.cos(angle)*dist; orig.lastY = cy + Math.sin(angle)*dist; } }); }
         function reset() { isVerified = false; atoms = { p: [], n: [], e: [] }; updateUI(); }
@@ -330,7 +330,52 @@
         }
         function verifyAtom() { const target = elements[currentIdx], isCorrect = (atoms.p.length === target.p && atoms.n.length === target.nt && atoms.e.length === target.p); const box = document.getElementById('alertBox'); box.style.display = 'block'; box.className = "animate-alert " + (isCorrect ? "alert-success" : "alert-wrong"); box.innerText = isCorrect ? `✨ 정답입니다! [${target.n}] 완성!` : "입자를 다시 확인해 보세요! ⚠️"; const nextBtn = document.getElementById('nextBtn'); if (isCorrect) { isVerified = true; triggerConfetti(); nextBtn.disabled = false; nextBtn.classList.add('btn-next-active'); } else { isVerified = false; nextBtn.disabled = true; nextBtn.style.background = "#adb5bd"; nextBtn.style.opacity = "0.6"; nextBtn.classList.remove('btn-next-active'); } setTimeout(() => { box.style.display = 'none'; }, 2200); }
         function toggleOrbit() { showOrbitLines = !showOrbitLines; const btn = document.getElementById('orbitToggleBtn'); btn.style.background = showOrbitLines ? "#adb5bd" : "var(--e-color)"; }
-        function drawAtom(targetCtx, move = true) { targetCtx.clearRect(0, 0, 800, 800); const eLen = atoms.e.length; let r = eLen === 0 ? 140 : (eLen < 3 ? 180 : (eLen < 11 ? 240 : 330)); targetCtx.shadowColor = 'rgba(0, 0, 0, 0.2)'; targetCtx.shadowBlur = 15; const bgGrad = targetCtx.createRadialGradient(cx-30, cy-30, 0, cx, cy, r); bgGrad.addColorStop(0, 'rgba(240, 248, 255, 1)'); bgGrad.addColorStop(1, 'rgba(220, 232, 245, 1)'); targetCtx.beginPath(); targetCtx.arc(cx, cy, r, 0, Math.PI * 2); targetCtx.fillStyle = bgGrad; targetCtx.fill(); targetCtx.shadowBlur = 0; atoms.p.forEach(p => drawBall(targetCtx, p.lastX, p.lastY, 14, '#ff4d4d', '+')); atoms.n.forEach(n => drawBall(targetCtx, n.lastX, n.lastY, 14, '#adb5bd', '')); let eIdx = 0; [2, 8, 8, 8].forEach((max, s) => { const count = Math.min(eLen - eIdx, max); if(count <= 0) return; const dist = 135 + (s * 60); if (showOrbitLines) { targetCtx.beginPath(); targetCtx.arc(cx, cy, dist, 0, Math.PI * 2); targetCtx.strokeStyle = 'rgba(51, 154, 240, 0.2)'; targetCtx.lineWidth = 2; targetCtx.stroke(); } for (let i = 0; i < count; i++) { const p = atoms.e[eIdx + i]; let currentAngle = (i * (Math.PI*2/count)) + (move ? (rotationAngle * (1 / (s + 1))) : 0); let ex = cx + Math.cos(currentAngle)*dist, ey = cy + Math.sin(currentAngle)*dist; if(move) { p.lastX = ex; p.lastY = ey; } drawBall(targetCtx, ex, ey, 13, '#339af0', '-'); } eIdx += count; }); }
+        function drawAtom(targetCtx, move = true) { 
+            targetCtx.clearRect(0, 0, 800, 800); 
+            const eLen = atoms.e.length; 
+            let r = eLen === 0 ? 140 : (eLen < 3 ? 180 : (eLen < 11 ? 240 : 330)); 
+            
+            targetCtx.shadowColor = 'rgba(0, 0, 0, 0.2)'; 
+            targetCtx.shadowBlur = 15; 
+            const bgGrad = targetCtx.createRadialGradient(cx-30, cy-30, 0, cx, cy, r); 
+            bgGrad.addColorStop(0, 'rgba(240, 248, 255, 1)'); 
+            bgGrad.addColorStop(1, 'rgba(220, 232, 245, 1)'); 
+            targetCtx.beginPath(); 
+            targetCtx.arc(cx, cy, r, 0, Math.PI * 2); 
+            targetCtx.fillStyle = bgGrad; 
+            targetCtx.fill(); 
+            targetCtx.shadowBlur = 0; 
+            
+            atoms.p.forEach(p => drawBall(targetCtx, p.lastX, p.lastY, 14, '#ff4d4d', '+')); 
+            atoms.n.forEach(n => drawBall(targetCtx, n.lastX, n.lastY, 14, '#adb5bd', '')); 
+            
+            let eIdx = 0; 
+            [2, 8, 8, 18].forEach((max, s) => { 
+                const count = Math.min(eLen - eIdx, max); 
+                if(count <= 0) return; 
+                const dist = 135 + (s * 60); 
+                
+                if (showOrbitLines) { 
+                    targetCtx.beginPath(); 
+                    targetCtx.arc(cx, cy, dist, 0, Math.PI * 2); 
+                    targetCtx.strokeStyle = 'rgba(51, 154, 240, 0.2)'; 
+                    targetCtx.lineWidth = 2; 
+                    targetCtx.stroke(); 
+                } 
+                
+                for (let i = 0; i < count; i++) { 
+                    const p = atoms.e[eIdx + i]; 
+                    let currentAngle = (i * (Math.PI*2/count)) + (move ? (rotationAngle * (1 / (s + 1))) : 0); 
+                    let ex = cx + Math.cos(currentAngle)*dist, ey = cy + Math.sin(currentAngle)*dist; 
+                    if(move) { 
+                        p.lastX = ex; 
+                        p.lastY = ey; 
+                    } 
+                    drawBall(targetCtx, ex, ey, 13, '#339af0', '-'); 
+                } 
+                eIdx += count; 
+            }); 
+        }
         function drawBall(c, x, y, r, color, label) { c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fillStyle = color; c.fill(); if (label) { c.fillStyle="white"; c.font=`bold ${r*1.2}px Arial`; c.textAlign="center"; c.textBaseline="middle"; c.fillText(label, x, y); } }
         function animate() { rotationAngle += 0.007; drawAtom(ctx, true); if (document.getElementById('page3').classList.contains('active')) drawAtom(cardCtx, false); if (confetti.length > 0) confetti.forEach(p => { if (p.life > 0) { p.x += p.vx; p.y += p.vy; p.vy += 0.5; p.life--; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.globalAlpha = p.life/100; ctx.fill(); ctx.globalAlpha = 1; } }); requestAnimationFrame(animate); }
         function triggerConfetti() { for (let i = 0; i < 60; i++) confetti.push({ x: cx, y: cy, vx: (Math.random()-0.5)*15, vy: (Math.random()-1.2)*20, r: Math.random()*5+2, color: `hsl(${Math.random()*360}, 70%, 60%)`, life: 100 }); }
