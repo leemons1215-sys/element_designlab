@@ -229,11 +229,17 @@
                     <div class="particle-info-box">양성자: <span id="cP">1</span> | 중성자: <span id="cN">0</span> | 전자: <span id="cE">1</span></div>
                     <div class="row-group" style="display:flex; gap:10px;">
                         <div class="card-input-box" style="flex:1;"><label>🌡️ 실온에서의 상태</label><select id="cardState" required onchange="checkCompletion()"><option value="" disabled selected>[선택]</option><option value="고체">고체</option><option value="액체">액체</option><option value="기체">기체</option></select></div>
-                        <div class="card-input-box" style="flex:1.2;"><label>🧬 금속 or 금속 아님</label><select id="cardType" required onchange="checkCompletion()"><option value="" disabled selected>[선택]</option><option value="금속">금속</option><option value="금속 아님">금속 아님</option></select></div>
+                        <div class="card-input-box" style="flex:1;"><label>🎨 물질의 색</label><input type="text" id="cardType" placeholder="예: 은백색" required oninput="checkCompletion()" style="width: 100%; padding: 12px; border: 2px solid #f1f3f5; border-radius: 10px; box-sizing: border-box; background: #f8f9fa; font-family: inherit; font-size: 1.15rem; font-weight: 700; text-align: center;"></div>
                     </div>
-                    <div class="card-input-box">
-                        <label>💧 물과 만났을 때</label>
-                        <select id="cardExample" required onchange="checkCompletion()"><option value="" disabled selected>[선택]</option><option value="변화 있음">변화 있음</option><option value="거의 변화 없음">거의 변화 없음</option></select>
+                    <div class="row-group" style="display:flex; gap:10px;">
+                        <div class="card-input-box" style="flex:1;">
+                            <label>💧 물과 만났을 때</label>
+                            <select id="cardExample" required onchange="checkCompletion()"><option value="" disabled selected>[선택]</option><option value="변화 있음">변화 있음</option><option value="거의 변화 없음">거의 변화 없음</option></select>
+                        </div>
+                        <div class="card-input-box" style="flex:1;">
+                            <label>🔬 다른 물질과 만났을 때</label>
+                            <select id="cardReaction" required onchange="checkCompletion()"><option value="" disabled selected>[선택]</option><option value="변화 있음">변화 있음</option><option value="거의 변화 없음">거의 변화 없음</option></select>
+                        </div>
                     </div>
                     <div class="card-input-box">
                         <label>✨ 원소의 특징, 쓰임새 등</label>
@@ -333,7 +339,7 @@
         function addFeatureField() { const list = document.getElementById('featureList'); const item = document.createElement('div'); item.className = 'feature-item'; item.innerHTML = `<textarea class="auto-height" placeholder="특징 또는 쓰임새를 입력하세요." oninput="checkCompletion(); autoResize(this);"></textarea><button class="remove-btn" onclick="this.parentElement.remove(); checkCompletion();">삭제</button>`; list.appendChild(item); checkCompletion(); }
         
         function checkCompletion() { 
-            const fields = ['cardSymbol', 'cardState', 'cardType', 'cardExample', 'authorNum', 'authorName']; 
+            const fields = ['cardSymbol', 'cardState', 'cardType', 'cardExample', 'cardReaction', 'authorNum', 'authorName']; 
             const allFilled = fields.every(id => document.getElementById(id).value.trim() !== ""); 
             const fCount = Array.from(document.querySelectorAll('#featureList textarea')).filter(ta => ta.value.trim().length > 0).length; 
             const btn = document.getElementById('downloadBtn'); 
@@ -374,6 +380,7 @@
             clonedCard.querySelector('#cardState').value = document.getElementById('cardState').value;
             clonedCard.querySelector('#cardType').value = document.getElementById('cardType').value;
             clonedCard.querySelector('#cardExample').value = document.getElementById('cardExample').value;
+            clonedCard.querySelector('#cardReaction').value = document.getElementById('cardReaction').value;
             
             const origTAs = originalCard.querySelectorAll('#featureList textarea');
             const cloneTAs = clonedCard.querySelectorAll('#featureList textarea');
