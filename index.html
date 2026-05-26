@@ -136,6 +136,8 @@
             position: absolute !important;
             left: -9999px !important; /* 화면에서 아예 안 보이도록 밖으로 밀어냄 */
             top: 0 !important;
+            height: auto !important;
+            min-height: auto !important;
         }
         .forced-vertical .card-left, .forced-vertical .card-right {
             width: 100% !important;
@@ -153,7 +155,18 @@
         .forced-vertical #cardSymbol { font-size: 1.5rem !important; }
         .forced-vertical .particle-info-box { font-size: 0.95rem !important; padding: 8px !important; }
         .forced-vertical .card-input-box label { font-size: 1rem !important; }
-        .forced-vertical .card-input-box input, .forced-vertical .card-input-box textarea, .forced-vertical .card-input-box select { padding: 8px !important; font-size: 1rem !important; }
+        .forced-vertical .card-input-box { height: auto !important; overflow: visible !important; }
+        .forced-vertical .card-input-box input, .forced-vertical .card-input-box select { padding: 8px !important; font-size: 1rem !important; }
+        .forced-vertical .card-input-box textarea { 
+            padding: 8px !important; 
+            font-size: 1rem !important; 
+            white-space: pre-wrap !important; 
+            word-wrap: break-word !important; 
+            overflow-wrap: break-word !important;
+            height: auto !important;
+            min-height: 40px !important;
+            overflow: visible !important;
+        }
     </style>
 </head>
 <body>
@@ -222,30 +235,33 @@
         <div class="page3-wrapper">
             <div id="elementCard" class="card-container">
                 <div class="card-left">
-                    <div class="card-header"><span id="cardName">수소</span><input type="text" id="cardSymbol" placeholder="?" maxlength="3" oninput="checkCompletion()" style="width: 70px; text-align: center; font-size: 1.8rem; font-weight: 800; color: #888; border: none; padding: 0; background: transparent; line-height: 1; box-sizing: border-box; outline: none;"></div>
+                    <div class="card-header"><span id="cardName">수소</span><input type="text" id="cardSymbol" placeholder="기호?" maxlength="3" oninput="checkCompletion()" style="width: 70px; text-align: center; font-size: 1.8rem; font-weight: 800; color: #888; border: none; padding: 0; background: transparent; line-height: 1; box-sizing: border-box; outline: none;"></div>
                     <div class="photo-upload-area"><img id="bgPhotoPreview"><canvas id="cardCanvas" width="800" height="800"></canvas></div>
                 </div>
                 <div class="card-right">
                     <div class="particle-info-box">양성자: <span id="cP">1</span> | 중성자: <span id="cN">0</span> | 전자: <span id="cE">1</span></div>
                     <div class="row-group" style="display:flex; gap:10px;">
                         <div class="card-input-box" style="flex:1;"><label>🌡️ 실온에서의 상태</label><select id="cardState" required onchange="checkCompletion()"><option value="" disabled selected>[선택]</option><option value="고체">고체</option><option value="액체">액체</option><option value="기체">기체</option></select></div>
-                        <div class="card-input-box" style="flex:1;"><label>🎨 물질의 색</label><input type="text" id="cardType" placeholder="예: 은백색" required oninput="checkCompletion()" style="width: 100%; padding: 12px; border: 2px solid #f1f3f5; border-radius: 10px; box-sizing: border-box; background: #f8f9fa; font-family: inherit; font-size: 1.15rem; font-weight: 700; text-align: center;"></div>
+                        <div class="card-input-box" style="flex:1;"><label>🧬 금속 or 금속 아님</label><select id="cardType" required onchange="checkCompletion()"><option value="" disabled selected>[선택]</option><option value="금속">금속</option><option value="금속 아님">금속 아님</option></select></div>
                     </div>
                     <div class="row-group" style="display:flex; gap:10px;">
                         <div class="card-input-box" style="flex:1;">
                             <label>💧 물과 만났을 때</label>
-                            <select id="cardExample" required onchange="checkCompletion()"><option value="" disabled selected>[선택]</option><option value="변화 있음">변화 있음</option><option value="거의 변화 없음">거의 변화 없음</option></select>
+                            <select id="cardExample" required onchange="checkCompletion()"><option value="" disabled selected>[선택]</option><option value="변화 있음">변화 있음</option><option value="변화 없음">변화 없음</option></select>
                         </div>
                         <div class="card-input-box" style="flex:1;">
                             <label>🔬 다른 물질과 만났을 때</label>
-                            <select id="cardReaction" required onchange="checkCompletion()"><option value="" disabled selected>[선택]</option><option value="변화 있음">변화 있음</option><option value="거의 변화 없음">거의 변화 없음</option></select>
+                            <select id="cardReaction" required onchange="checkCompletion()"><option value="" disabled selected>[선택]</option><option value="변화 있음">변화 있음</option><option value="변화 없음">변화 없음</option></select>
                         </div>
                     </div>
                     <div class="card-input-box">
-                        <label>✨ 원소의 특징, 쓰임새 등</label>
+                        <label>💡 쓰임새 (2개 이상)</label>
+                        <textarea id="cardUsage" class="auto-height" placeholder="예: 물의 구성 성분, 로켓 연료, 연료 전지" required oninput="autoResize(this); checkCompletion();" style="text-align:center;"></textarea>
+                    </div>
+                    <div class="card-input-box">
+                        <label>✨ 그 외 특징 (1개 이상)</label>
                         <div id="featureList" style="display:flex; flex-direction:column; gap:8px;">
-                            <div class="feature-item"><textarea class="auto-height" placeholder="(예시) 물의 구성 성분이고, 로켓 연료로 사용된다." oninput="autoResize(this); checkCompletion();"></textarea></div>
-                            <div class="feature-item"><textarea class="auto-height" placeholder="(예시) 우주에서 가장 가볍고 풍부한 원소이다" oninput="autoResize(this); checkCompletion();"></textarea></div>
+                            <div class="feature-item"><textarea class="auto-height" placeholder="예: 은백색의 금속으로 물과 만나면 격렬하게 반응한다." oninput="autoResize(this); checkCompletion();"></textarea></div>
                         </div>
                         <button id="addFeatureBtn" class="add-feature-btn" onclick="addFeatureField()">+ 특징 입력칸 추가</button>
                     </div>
@@ -381,15 +397,15 @@
         function triggerConfetti() { for (let i = 0; i < 60; i++) confetti.push({ x: cx, y: cy, vx: (Math.random()-0.5)*15, vy: (Math.random()-1.2)*20, r: Math.random()*5+2, color: `hsl(${Math.random()*360}, 70%, 60%)`, life: 100 }); }
         function handlePhotoUpload(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = (e) => { const preview = document.getElementById('bgPhotoPreview'); preview.src = e.target.result; preview.style.display = 'block'; checkCompletion(); }; reader.readAsDataURL(input.files[0]); } }
         function autoResize(ta) { ta.style.height = '42px'; ta.style.height = (ta.scrollHeight) + 'px'; }
-        function addFeatureField() { const list = document.getElementById('featureList'); const item = document.createElement('div'); item.className = 'feature-item'; item.innerHTML = `<textarea class="auto-height" placeholder="특징 또는 쓰임새를 입력하세요." oninput="checkCompletion(); autoResize(this);"></textarea><button class="remove-btn" onclick="this.parentElement.remove(); checkCompletion();">삭제</button>`; list.appendChild(item); checkCompletion(); }
+        function addFeatureField() { const list = document.getElementById('featureList'); const item = document.createElement('div'); item.className = 'feature-item'; item.innerHTML = `<textarea class="auto-height" placeholder="특징을 입력하세요." oninput="checkCompletion(); autoResize(this);"></textarea><button class="remove-btn" onclick="this.parentElement.remove(); checkCompletion();">삭제</button>`; list.appendChild(item); checkCompletion(); }
         
         function checkCompletion() { 
-            const fields = ['cardSymbol', 'cardState', 'cardType', 'cardExample', 'cardReaction', 'authorNum', 'authorName']; 
+            const fields = ['cardSymbol', 'cardState', 'cardType', 'cardExample', 'cardReaction', 'cardUsage', 'authorNum', 'authorName']; 
             const allFilled = fields.every(id => document.getElementById(id).value.trim() !== ""); 
-            const fCount = Array.from(document.querySelectorAll('#featureList textarea')).filter(ta => ta.value.trim().length > 0).length; 
+            const featureCount = Array.from(document.querySelectorAll('#featureList textarea')).filter(ta => ta.value.trim().length > 0).length; 
             const btn = document.getElementById('downloadBtn'); 
             const alertBox = document.getElementById('cardAlertBox'); 
-            if(allFilled && fCount >= 1) { btn.classList.add('btn-ready'); alertBox.style.display = 'none'; return true; } else { btn.classList.remove('btn-ready'); return false; } 
+            if(allFilled && featureCount >= 1) { btn.classList.add('btn-ready'); alertBox.style.display = 'none'; return true; } else { btn.classList.remove('btn-ready'); return false; } 
         }
 
         /* 💡 화면 전환 효과(Layout Shift)를 차단하기 위해 메모리 상에서 복제하여 캡처하는 로직 */
@@ -427,13 +443,29 @@
             clonedCard.querySelector('#cardExample').value = document.getElementById('cardExample').value;
             clonedCard.querySelector('#cardReaction').value = document.getElementById('cardReaction').value;
             
+            // cardUsage textarea 복사 및 높이 조정
+            const origUsageTA = document.getElementById('cardUsage');
+            const cloneUsageTA = clonedCard.querySelector('#cardUsage');
+            if(origUsageTA && cloneUsageTA) {
+                cloneUsageTA.value = origUsageTA.value;
+                cloneUsageTA.style.height = 'auto';
+                cloneUsageTA.style.height = cloneUsageTA.scrollHeight + 'px';
+            }
+            
+            // featureList textarea 복사
             const origTAs = originalCard.querySelectorAll('#featureList textarea');
             const cloneTAs = clonedCard.querySelectorAll('#featureList textarea');
-            origTAs.forEach((ta, index) => { if(cloneTAs[index]) cloneTAs[index].value = ta.value; });
+            origTAs.forEach((ta, index) => { 
+                if(cloneTAs[index]) {
+                    cloneTAs[index].value = ta.value;
+                    cloneTAs[index].style.height = 'auto';
+                    cloneTAs[index].style.height = cloneTAs[index].scrollHeight + 'px';
+                }
+            });
             
             // 3. 복제본 내부에서 캡처용으로 필요 없는 디자인 요소(삭제/추가 버튼)들을 제거합니다.
-            const clonedAddBtn = clonedCard.querySelector('#addFeatureBtn');
-            if(clonedAddBtn) clonedAddBtn.style.display = 'none';
+            const clonedAddFeatureBtn = clonedCard.querySelector('#addFeatureBtn');
+            if(clonedAddFeatureBtn) clonedAddFeatureBtn.style.display = 'none';
             clonedCard.querySelectorAll('.remove-btn').forEach(b => b.style.display = 'none');
             
             // 4. 복제본에만 'forced-vertical' 클래스를 주입하여 화면 바깥 오프셋 구역에 임시 배치합니다.
