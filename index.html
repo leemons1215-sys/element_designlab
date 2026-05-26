@@ -136,8 +136,6 @@
             position: absolute !important;
             left: -9999px !important; /* 화면에서 아예 안 보이도록 밖으로 밀어냄 */
             top: 0 !important;
-            height: auto !important;
-            min-height: auto !important;
         }
         .forced-vertical .card-left, .forced-vertical .card-right {
             width: 100% !important;
@@ -155,17 +153,13 @@
         .forced-vertical #cardSymbol { font-size: 1.5rem !important; }
         .forced-vertical .particle-info-box { font-size: 0.95rem !important; padding: 8px !important; }
         .forced-vertical .card-input-box label { font-size: 1rem !important; }
-        .forced-vertical .card-input-box { height: auto !important; overflow: visible !important; }
-        .forced-vertical .card-input-box input, .forced-vertical .card-input-box select { padding: 8px !important; font-size: 1rem !important; }
+        .forced-vertical .card-input-box input, .forced-vertical .card-input-box textarea, .forced-vertical .card-input-box select { padding: 8px !important; font-size: 1rem !important; }
         .forced-vertical .card-input-box textarea { 
-            padding: 8px !important; 
-            font-size: 1rem !important; 
             white-space: pre-wrap !important; 
             word-wrap: break-word !important; 
             overflow-wrap: break-word !important;
-            height: auto !important;
-            min-height: 40px !important;
-            overflow: visible !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
         }
     </style>
 </head>
@@ -259,9 +253,9 @@
                         <textarea id="cardUsage" class="auto-height" placeholder="예: 물의 구성 성분, 로켓 연료, 연료 전지" required oninput="autoResize(this); checkCompletion();" style="text-align:center;"></textarea>
                     </div>
                     <div class="card-input-box">
-                        <label>✨ 그 외 특징 (1개 이상)</label>
+                        <label>✨ 그 외 특징 (색깔, 냄새, 밀도 등 1개 이상)</label>
                         <div id="featureList" style="display:flex; flex-direction:column; gap:8px;">
-                            <div class="feature-item"><textarea class="auto-height" placeholder="예: 은백색의 금속으로 물과 만나면 격렬하게 반응한다." oninput="autoResize(this); checkCompletion();"></textarea></div>
+                            <div class="feature-item"><textarea class="auto-height" placeholder="예: 무색 무취의 기체로 밀도가 작아 공기 중에서 떠오른다." oninput="autoResize(this); checkCompletion();"></textarea></div>
                         </div>
                         <button id="addFeatureBtn" class="add-feature-btn" onclick="addFeatureField()">+ 특징 입력칸 추가</button>
                     </div>
@@ -443,13 +437,11 @@
             clonedCard.querySelector('#cardExample').value = document.getElementById('cardExample').value;
             clonedCard.querySelector('#cardReaction').value = document.getElementById('cardReaction').value;
             
-            // cardUsage textarea 복사 및 높이 조정
+            // cardUsage textarea 복사
             const origUsageTA = document.getElementById('cardUsage');
             const cloneUsageTA = clonedCard.querySelector('#cardUsage');
             if(origUsageTA && cloneUsageTA) {
                 cloneUsageTA.value = origUsageTA.value;
-                cloneUsageTA.style.height = 'auto';
-                cloneUsageTA.style.height = cloneUsageTA.scrollHeight + 'px';
             }
             
             // featureList textarea 복사
@@ -458,8 +450,6 @@
             origTAs.forEach((ta, index) => { 
                 if(cloneTAs[index]) {
                     cloneTAs[index].value = ta.value;
-                    cloneTAs[index].style.height = 'auto';
-                    cloneTAs[index].style.height = cloneTAs[index].scrollHeight + 'px';
                 }
             });
             
